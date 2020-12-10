@@ -1,21 +1,32 @@
-import "./public-path";
-import React from "react";
-import ReactDOM from "react-dom";
-import "antd/dist/antd.css";
+import './public-path'
+import { createRouter, createWebHistory } from 'vue-router'
+import { createApp } from 'vue'
+import App from './App.vue'
+import routes from './router'
+import store from './store'
 
-import App from "./App.jsx";
+
+let instance = null;
+let router = null;
 
 /**
  * 渲染函数
  * 两种情况：主应用生命周期钩子中运行 / 微应用单独启动时运行
  */
 function render() {
-  ReactDOM.render(<App />, document.getElementById("root"));
+  // 在 render 中创建 VueRouter，可以保证在卸载微应用时，移除 location 事件监听，防止事件污染
+  router = createRouter({
+    history: createWebHistory(window.__POWERED_BY_QIANKUN__ ? "/vue3" : "/"),
+    routes
+  })
+
+  // 挂载应用
+  instance = createApp(App).use(store).use(router).mount('#app')
 }
 
 // 独立运行时，直接挂载应用
 if (!window.__POWERED_BY_QIANKUN__) {
-  render();
+  render()
 }
 
 /**
@@ -23,14 +34,14 @@ if (!window.__POWERED_BY_QIANKUN__) {
  * 通常我们可以在这里做一些全局变量的初始化，比如不会在 unmount 阶段被销毁的应用级别的缓存等。
  */
 export async function bootstrap() {
-  console.log("ReactMicroApp bootstraped");
+  console.log("Vue3App bootstraped");
 }
 
 /**
  * 应用每次进入都会调用 mount 方法，通常我们在这里触发应用的渲染方法
  */
 export async function mount(props) {
-  console.log("ReactMicroApp mount", props);
+  console.log("Vue3App mount", props);
   render(props);
 }
 
@@ -38,6 +49,8 @@ export async function mount(props) {
  * 应用每次 切出/卸载 会调用的方法，通常在这里我们会卸载微应用的应用实例
  */
 export async function unmount() {
-  console.log("ReactMicroApp unmount");  
-  ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+  console.log(instance)
+  console.log("Vue3App unmount");
+  instance = null;
+  router = null;
 }

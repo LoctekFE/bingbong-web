@@ -36,6 +36,11 @@ export default {
           path: "/vue"
         },
         {
+          key: "Vue3App",
+          title: "Vue3 应用",
+          path: "/vue3"
+        },
+        {
           key: "ReactApp",
           title: "React 应用",
           path: "/react"
